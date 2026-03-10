@@ -78,6 +78,6 @@ plt.ylabel("Magnitude (log)")
 plt.xlim(0, 5000)
 plt.legend()
 plt.grid(True)
-
+plt.savefig("Analisis Spektrum FFT 1024 Point.png")
 plt.tight_layout()
 plt.show()
