@@ -9,31 +9,31 @@ I = 0.006
 g = 9.8
 l = 0.3
 
-p = I*(M+m) + M*m*l**2
+p = I*(M+m) + M*m*l**2 #denominator
 
 # STATE SPACE MODEL
 A = np.array([
-[0, 1, 0, 0],
-[0, -(I+m*l**2)*b/p, (m**2*g*l**2)/p, 0],
-[0, 0, 0, 1],
-[0, -(m*l*b)/p, m*g*l*(M+m)/p, 0]
+[0, 1, 0, 0], #posisi cart berubah sesuai kecepatan
+[0, -(I+m*l**2)*b/p, (m**2*g*l**2)/p, 0], #persamaan gerak cart (nilai positif dari sudut phi, kalau pendulum miring car kedorong)
+[0, 0, 0, 1], #sudut berubah sesuai kecepatan sudutnya
+[0, -(m*l*b)/p, m*g*l*(M+m)/p, 0] #persamaan gerak pendulum (nilai positif besar dari phi berarti gravitasi mendestabilkan pendulum, makanya kalau miring jadi makin miring-unstable)
 ])
 
 B = np.array([
-[0],
-[(I+m*l**2)/p],
-[0],
-[m*l/p]
+[0], #gaya tidak langsung mengubah posisi cart
+[(I+m*l**2)/p], #gaya langsung mempengaruhi kecepatan cart
+[0], #gaya tidak langsung mengubah sudut pendulum
+[m*l/p] #gaya ke cart mempengaruhi kecepatan sudut penduum melalui kopling mekanik
 ])
 
 C = np.array([
-[1,0,0,0],   # posisi cart
-[0,0,1,0]    # sudut pendulum
+[1,0,0,0],   # output pertama: posisi cart
+[0,0,1,0]    # output kedua: sudut pendulum
 ])
 
-D = np.zeros((2,1))
+D = np.zeros((2,1)) #kedua matriks 0
 
-# DISCRETIZATION
+# DISCRETIZATION (euler forward)
 dt = 0.001
 Ad = np.eye(4) + A*dt
 Bd = B*dt
@@ -43,30 +43,32 @@ Q = np.eye(4)*0.001
 R = np.eye(2)*0.01
 
 P = np.eye(4)
+
 x_hat = np.zeros((4,1))
 
 # SIMULASI SISTEM
 steps = 5000   
 
-# kondisi awal sistem
+# kondisi awal sistem (pendulum dimulai dengan sedikit miri 2.9 derajat)
 x_real = np.array([
-[0],
-[0],
-[0.05],
-[0]
+[0], #posisi cart = 0 meter
+[0], #kecepatan cart = 0 m/s
+[0.05], #sudut pendulum = 0.05 rad = 2.9 derajat
+[0] #kecepatan sudut == 0 rad/s
 ])
 
 # penyimpanan data
-theta_real = []
-theta_est = []
-theta_meas = []
+theta_real = [] #sudut dari simulasi
+theta_est = [] #sudut hasi; estimasi 
+theta_meas = [] #sudut hasil pengukuran sendor (noisy)
 
+#loop
 for k in range(steps):
 
     # input kontrol (belum ada kontrol)
     u = np.array([[0]])
 
-    # REAL SYSTEM
+    # REAL SYSTEM (persamaan state diskrit)
     x_real = Ad @ x_real + Bd @ u
 
     # MEASUREMENT DENGAN NOISE
@@ -87,8 +89,8 @@ for k in range(steps):
     P = (np.eye(4) - K @ C) @ P_pred
 
     # simpan data
-    theta_real.append(x_real[2,0])
-    theta_est.append(x_hat[2,0])
+    theta_real.append(x_real[2,0]) #sudut nyata (elemen dari kedua state)
+    theta_est.append(x_hat[2,0]) #sudut estimasi kalman
 
 # PLOT
 t = np.arange(steps)*dt
