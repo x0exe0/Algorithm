@@ -53,7 +53,7 @@ steps = 5000
 x_real = np.array([
 [0], #posisi cart = 0 meter
 [0], #kecepatan cart = 0 m/s
-[0.05], #sudut pendulum = 0.05 rad = 2.9 derajat
+[0], #sudut pendulum = 0.05 rad = 2.9 derajat
 [0] #kecepatan sudut == 0 rad/s
 ])
 
