@@ -53,7 +53,7 @@ steps = 5000
 x_real = np.array([
 [0], #posisi cart = 0 meter
 [0], #kecepatan cart = 0 m/s
-[0], #sudut pendulum = 0.05 rad = 2.9 derajat
+[0], #sudut pendulum = 0 rad 
 [0] #kecepatan sudut == 0 rad/s
 ])
 
@@ -92,16 +92,48 @@ for k in range(steps):
     theta_real.append(x_real[2,0]) #sudut nyata (elemen dari kedua state)
     theta_est.append(x_hat[2,0]) #sudut estimasi kalman
 
+#konversi 
+theta_rela = np.array(theta_real)
+theta_est = np.array(theta_est)
+theta_meas = np.array(theta_meas)
+
+#hitung error
+err_meas = theta_meas - theta_real
+err_est = theta_est - theta_real
+
+#hitung RMSE (root mean square error)
+rmse_meas = np.sqrt(np.mean(err_meas**2))
+rmse_est = np.sqrt(np.mean(err_est**2))
+
+#noise reduction gain (dB)
+db_improvement = 20*np.log10(rmse_meas / rmse_est)
+
 # PLOT
 t = np.arange(steps)*dt
 
-plt.figure(figsize=(10,5))
-plt.plot(t, theta_real, label="Real θ", linewidth=2)
-plt.plot(t, theta_meas, label="Measured θ (Noisy)", alpha=0.6)
-plt.plot(t, theta_est, label="Estimated θ (Kalman)", linewidth=2)
-plt.xlabel("Time (s)")
-plt.ylabel("Angle (rad)")
-plt.title("Kalman Filter Estimation - CTMS Model")
-plt.legend()
-plt.grid()
+fig, ax = plt.subplots(2,1, figsize=(10,8))
+
+# Plot 1 : Estimasi Kalman
+ax[0].plot(t, theta_real, label="Real θ", linewidth=2)
+ax[0].plot(t, theta_meas, label="Measured θ (Noisy)", alpha=0.6)
+ax[0].plot(t, theta_est, label="Estimated θ (Kalman)", linewidth=2)
+ax[0].set_xlabel("Time (s)")
+ax[0].set_ylabel("Angle (rad)")
+ax[0].set_title("Kalman Filter Estimation - CTMS Model")
+ax[0].legend()
+ax[0].grid()
+
+# Plot 2 : Error dalam dB
+ax[1].plot(t, 20*np.log10(np.abs(err_meas) + 1e-6), label="Sensor Error (dB)", alpha=0.3)
+ax[1].plot(t, 20*np.log10(np.abs(err_est) + 1e-6), label="Kalman Error (dB)")
+ax[1].axhline(y=20*np.log10(rmse_meas), linestyle='--', label="Avg Sensor Noise")
+ax[1].axhline(y=20*np.log10(rmse_est), linestyle='--', label="Avg Kalman Error")
+ax[1].set_title("Error Level (dB)")
+ax[1].set_ylabel("Error (dB)")
+ax[1].set_xlabel("Time (s)")
+ax[1].legend()
+ax[1].grid()
+
+plt.tight_layout()
+plt.savefig("Kalman_Filter_Result.png")
 plt.show()
