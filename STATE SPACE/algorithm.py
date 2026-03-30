@@ -113,7 +113,7 @@ t = np.arange(steps)*dt
 
 fig, ax = plt.subplots(2,1, figsize=(10,8))
 
-# Plot 1 : Estimasi Kalman
+# Plot 1 : (Estimasi Kalman)
 ax[0].plot(t, theta_real, label="Real θ", linewidth=2)
 ax[0].plot(t, theta_meas, label="Measured θ (Noisy)", alpha=0.6)
 ax[0].plot(t, theta_est, label="Estimated θ (Kalman)", linewidth=2)
@@ -123,7 +123,7 @@ ax[0].set_title("Kalman Filter Estimation - CTMS Model")
 ax[0].legend()
 ax[0].grid()
 
-# Plot 2 : Error dalam dB
+# Plot 2 (Error dalam dB)
 ax[1].plot(t, 20*np.log10(np.abs(err_meas) + 1e-6), label="Sensor Error (dB)", alpha=0.3)
 ax[1].plot(t, 20*np.log10(np.abs(err_est) + 1e-6), label="Kalman Error (dB)")
 ax[1].axhline(y=20*np.log10(rmse_meas), linestyle='--', label="Avg Sensor Noise")
