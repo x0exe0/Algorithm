@@ -31,21 +31,16 @@ def dragonfly_ode(t, x):
         
     return xdot
 
-# JALANKAN SIMULASI (SOLVER)
-print("Menghitung lintasan fisika... Mohon tunggu sebentar.")
-
-# Rekam data sebanyak 150 frame (dari detik 0 sampai 3)
-t_frames = np.linspace(0, 3, 100) 
+t_frames = np.linspace(0, 3, 94) 
 x0 = np.concatenate((np.array([0, 0, 0]), V0))
 
-# Memecahkan persamaan diferensial
+# solve
 sol = solve_ivp(dragonfly_ode, [0, 3], x0, t_eval=t_frames)
-
 x_out = sol.y
 # Hitung ulang lintasan bola di semua frame untuk plotting
 RT_out = RT0[:, None] + VT0[:, None] * t_frames + 0.5 * np.array([[0], [0], [-g]]) * t_frames**2
 
-# --- Analisis Miss Distance (Jarak Meleset) ---
+#Analisis Miss Distance (Jarak Meleset)
 jarak_error = np.sqrt(np.sum((x_out[0:3, :] - RT_out)**2, axis=0))
 min_error = np.min(jarak_error)
 t_min = t_frames[np.argmin(jarak_error)]
@@ -54,9 +49,6 @@ print(f"Jarak meleset terkecil : {min_error:.4f} meter")
 print(f"Waktu tabrakan terbaik : {t_min:.3f} detik\n")
 print("...")
 
-# ==========================================
-# 4. ANIMASI 3D UNTUK VS CODE
-# ==========================================
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
 
