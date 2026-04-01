@@ -23,7 +23,7 @@ def dragonfly_cps(t, x):
         xdot[3:6] = np.array([0,0,-g])
     return xdot
 
-t_frames = np.linspace(0,3,250) 
+t_frames = np.linspace(0,3.5,250) 
 x0 = np.concatenate((np.array([0,0,0]), V0))
 
 sol = solve_ivp(dragonfly_cps, [0,3.5], x0, t_eval=t_frames, max_step=0.01)
